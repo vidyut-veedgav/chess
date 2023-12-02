@@ -68,10 +68,33 @@ function dragDrop(e) {
     console.log('e.target', e.target);
     const correctGo = draggedElement.firstChild.classList.contains(playerGo)
     const taken = e.target.classList.contains('piece')
+    const valid = checkIfValid()
     const opponentGo = playerGo === 'white' ? 'black' : 'white'
     console.log('opponentGo', opponentGo);
     const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo)
     
+    if (correctGo) {
+
+        if (takenByOpponent && valid) {
+            e.target.parentNode.append(draggedElement)
+            e.target.remove()
+            changePlayer()
+            return
+        }
+
+        if (taken && !takenByOpponent) {
+            infoDisplay.textContent = "Invalid Move"
+            setTimeout(() => infoDisplay.textContent = "", 2000)
+            return
+        }
+
+        if (valid) {
+            e.target.append(draggedElement)
+            changePlayer()
+            return
+        }
+    }
+
     //e.target.parentNode.append(draggedElement)
     //e.target.remove()
     //e.target.append(draggedElement)
@@ -99,4 +122,13 @@ function reverseIds() {
 function revertIds() {
     const allSquares = document.querySelectorAll(".square")
     allSquares.forEach((square, i) => square.setAttribute('square-id', i))
+}
+
+function checkIfValid(target) {
+    const startId = Number(startPositionId)
+    const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
+    const piece = draggedElement.id
+    console.log('startId', startId)
+    console.log('targetId', targetId)
+    console.log('piece', piece)
 }
