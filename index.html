@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chess</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div id="gameboard"></div>
+    <p>It's <span id="player"></span> turn.</p>
+    <p id="information"></p>
+
+    <script src="pieces.js"></script>
+    <script src="app.js"></script>
+</body>
+
+<style>
+    #gameboard {
+    width: 320px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; 
+
+    }
+
+    .square {
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .square div {
+        height: 40px; 
+        width: 40px;  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px; 
+    }
+
+    .beige {
+        background-color: rgb(149, 144, 154);
+    }
+
+    .brown {
+        background-color: rgb(128, 103, 182);
+    }
+
+    .black {
+        color: black;
+    }
+
+    .white {
+        color: white;
+    }
+</style>
+</html>
