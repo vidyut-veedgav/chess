@@ -131,4 +131,9 @@ function checkIfValid(target) {
     console.log('startId', startId)
     console.log('targetId', targetId)
     console.log('piece', piece)
+
+    switch (piece) {
+        case 'pawn' :
+             
+    }
 }
