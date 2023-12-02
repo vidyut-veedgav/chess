@@ -53,7 +53,7 @@ let startPositionId
 let draggedElement
 
 function dragStart(e) {
-    console.log(e.target.parentNode.getAttribute('square-id'));
+    startPositionId = e.target.parentNode.getAttribute('square-id');
     draggedElement = e.target
 }
 
@@ -63,14 +63,10 @@ function dragOver(e) {
 
 function dragDrop(e) {
     e.stopPropagation() 
-    console.log('playerGo', playerGo);
-
-    console.log('e.target', e.target);
     const correctGo = draggedElement.firstChild.classList.contains(playerGo)
     const taken = e.target.classList.contains('piece')
-    const valid = checkIfValid()
+    const valid = checkIfValid(e.target)
     const opponentGo = playerGo === 'white' ? 'black' : 'white'
-    console.log('opponentGo', opponentGo);
     const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo)
     
     if (correctGo) {
@@ -125,15 +121,51 @@ function revertIds() {
 }
 
 function checkIfValid(target) {
-    const startId = Number(startPositionId)
     const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
+    const startId = Number(startPositionId)
     const piece = draggedElement.id
-    console.log('startId', startId)
-    console.log('targetId', targetId)
-    console.log('piece', piece)
+    console.log('targetId', targetId);
+    console.log('startId', startId);
+    console.log('piece', piece);
 
     switch (piece) {
         case 'pawn' :
-             
+            const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
+            if (starterRow.includes(startId) && startId + width * 2 === targetId
+            || startId + width === targetId
+            || startId + width - 1 === targetId && document.querySelector('[square-id="${startId + width - 1}"]').firstChild
+            || startId + width + 1 === targetId && document.querySelector('[square-id="${startId + width + 1}"]').firstChild) 
+            {
+                return true
+            }
+            break; 
+        case 'knight' :
+            if (
+                startId + width * 2 + 1 === targetId ||
+                startId + width * 2 - 1 === targetId ||
+                startId + width - 2 === targetId ||
+                startId + width + 2 === targetId ||
+                startId - width * 2 + 1 === targetId ||
+                startId - width * 2 - 1 === targetId ||
+                startId - width - 2 === targetId ||
+                startId - width + 2 === targetId
+                ) {
+                    return true
+            }
+            break;
+        case 'bishop' :
+            if (
+                startId + width + 1 === targetId ||
+                startId + width * 2 + 2 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId ||
+                startId + width * 3 + 3 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
+                startId + width * 4 + 4 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
+                startId + width * 5 + 5 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
+                startId + width * 6 + 6 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
+                startId + width * 7 + 7 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId 
+            )
+            {
+                return true
+            }
+            break;
     }
 }
