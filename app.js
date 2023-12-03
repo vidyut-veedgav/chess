@@ -68,32 +68,52 @@ function dragDrop(e) {
     console.log(e.target);
 
     //check if the correct player is going
-    const isCorrectGo = draggedElement.firstChild.classList.contains(playerGo)
-    console.log("isCorrectGo", isCorrectGo);
+    const correctTurn = draggedElement.firstChild.classList.contains(playerGo)
+    console.log("isCorrectGo", correctTurn);
 
     //keeping track of the opponent's color for a given move
-    const isOpponentGo = playerGo === 'white' ? 'black' : 'white'
-    console.log("isOpponentGo", isOpponentGo);
+    const opponentTurn = playerGo === 'white' ? 'black' : 'white'
+    console.log("isOpponentGo", opponentTurn);
 
     //check if something is taken
-    const isSpotTaken = e.target.classList.contains('piece');
+    const squareOccupied = e.target.classList.contains('piece');
 
     //check if something is taken by opponent
-    const takenByOpponent = (e.target !== null) && e.target.classList.contains(isOpponentGo);
-    //const takenByOpponent = e.target.firstChild?.classList.contains(isOpponentGo)
+    const opponentPieceCaptured = (e.target !== null) && e.target.classList.contains(opponentTurn);
+    console.log("takenByOpponent", opponentPieceCaptured);
 
-    console.log("takenByOpponent", takenByOpponent);
+    //check if the movement is valid
+    const validMove = checkIfValid(e.target)
 
-    
-    if (isCorrectGo) {
-        if (takenByOpponent && isValid) {
+    //checks if the correct player is going
+    if (correctTurn) {
+
+        //checks if the move is valid and is a taking action
+        if (opponentPieceCaptured && validMove) {
+            console.log("isValid", validMove);
             e.target.parentNode.append(draggedElement)
             e.target.remove()
             changePlayer()
             return
         }
+
+        //checks if a player attempts to attempts to capture their own piece
+        if (squareOccupied && !opponentPieceCaptured) {
+            console.log("Invalid move: Square already occupied");
+            infoDisplay.textContent = "Invalid Move"
+            setTimeout(() => infoDisplay.textContent = "", 2000)
+            return
+        }
+
+        //checks if the move is just valid and no piece is taken
+        if (validMove) {
+            console.log(validMove);
+            console.log("Valid move: Normal move");
+            e.target.append(draggedElement)
+            changePlayer()
+            return
+        }
     }
-    
     changePlayer()
 
     /*
@@ -139,19 +159,11 @@ function dragDrop(e) {
     */
 }
 
-function takePiece(targetSquare) {
-    const opponentPieceColor = playerGo === 'black' ? 'white' : 'black';
-
-    // Check if the target square is occupied by an opponent's piece
-    if (targetSquare.firstChild && targetSquare.firstChild.classList.contains(opponentPieceColor)) {
-        // Remove the opponent's piece from the board
-        targetSquare.removeChild(targetSquare.firstChild);
-        return true; // Return true to indicate a successful piece capture
-    }
-    return false; // Return false if no piece was captured
-}
-
-
+/**
+ * a function which checks if the 
+ * @param {} target 
+ * @returns 
+ */
 function checkIfValid(target) {
 
     const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
@@ -163,6 +175,16 @@ function checkIfValid(target) {
 
     switch (piece) {
         case 'pawn':
+            const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
+            if (starterRow.includes(startId) && startId + width * 2 === targetId
+            || startId + width === targetId
+            || startId + width - 1 === targetId && document.querySelector('[square-id="${startId + width - 1}"]').firstChild
+            || startId + width + 1 === targetId && document.querySelector('[square-id="${startId + width + 1}"]').firstChild) 
+            {
+                return true
+            }
+            break; 
+        /*
             console.log("PAWN HAS BEEN MOVED");
             const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
             if (
@@ -183,6 +205,7 @@ function checkIfValid(target) {
                 return true
             } 
             break; 
+            */
 
         case 'knight':
             console.log("KNIGHT HAS BEEN MOVED");
