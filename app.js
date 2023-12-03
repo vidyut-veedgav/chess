@@ -4,7 +4,7 @@ const playerDisplay = document.querySelector("#player"); //player
 const infoDisplay = document.querySelector("#info-display"); //info
 const width = 8; //width of gameboard
 let playerGo = 'black'
-playerDisplay.textContent = 'blacks'
+playerDisplay.textContent = "black's"
 
 const startPieces = [
     rook, knight, bishop, queen, king, bishop, knight, rook,
@@ -43,7 +43,7 @@ createBoard()
  
 const allSquares = document.querySelectorAll("#gameboard .square")
 
-allSquares.forEach((square) => {
+allSquares.forEach(square => {
     square.addEventListener('dragstart', dragStart)
     square.addEventListener('dragover', dragOver)
     square.addEventListener('drop', dragDrop)
@@ -53,7 +53,7 @@ let startPositionId
 let draggedElement
 
 function dragStart(e) {
-    startPositionId = e.target.parentNode.getAttribute('square-id');
+    startPositionId = e.target.parentNode.getAttribute('square-id')
     draggedElement = e.target
 }
 
@@ -72,6 +72,7 @@ function dragDrop(e) {
     if (correctGo) {
 
         if (takenByOpponent && valid) {
+            console.log("Valid move: Take opponent's piece");
             e.target.parentNode.append(draggedElement)
             e.target.remove()
             changePlayer()
@@ -79,33 +80,220 @@ function dragDrop(e) {
         }
 
         if (taken && !takenByOpponent) {
+            console.log("Invalid move: Square already occupied");
             infoDisplay.textContent = "Invalid Move"
             setTimeout(() => infoDisplay.textContent = "", 2000)
             return
         }
 
         if (valid) {
+            console.log("Valid move: Normal move");
             e.target.append(draggedElement)
             changePlayer()
             return
         }
     }
-
-    //e.target.parentNode.append(draggedElement)
-    //e.target.remove()
-    //e.target.append(draggedElement)
+    console.log("Invalid move: Incorrect piece or invalid destination");
     changePlayer()
+}
+
+function checkIfValid(target) {
+    const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
+    const startId = Number(startPositionId)
+    const piece = draggedElement.id
+    console.log('targetId', targetId);
+    console.log('startId', startId);
+    console.log('piece', piece);
+
+    switch (piece) {
+        case 'pawn':
+            console.log("PAWN HAS BEEN MOVED");
+            const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
+            if (starterRow.includes(startId) && startId + width * 2 === targetId
+            || startId + width === targetId
+            || startId + width - 1 === targetId && document.querySelector('[square-id="${startId + width - 1}"]').firstChild
+            || startId + width + 1 === targetId && document.querySelector('[square-id="${startId + width + 1}"]').firstChild) 
+            {
+                return true
+            }
+            break; 
+        case 'knight':
+            console.log("KNIGHT HAS BEEN MOVED");
+            if (
+                startId + width * 2 + 1 === targetId ||
+                startId + width * 2 - 1 === targetId ||
+                startId + width - 2 === targetId ||
+                startId + width + 2 === targetId ||
+                startId - width * 2 + 1 === targetId ||
+                startId - width * 2 - 1 === targetId ||
+                startId - width - 2 === targetId ||
+                startId - width + 2 === targetId
+                ) {
+                    return true
+            }
+            break;
+            
+        case 'bishop':
+            console.log("BISHOP HAS BEEN MOVED");
+            const isDiagonalMove = Math.abs(targetId % width - startId % width) === Math.abs(Math.floor(targetId / width) - Math.floor(startId / width))
+            if (isDiagonalMove) {
+                const directionX = targetId % width > startId % width ? 1 : -1;
+                const directionY = Math.floor(targetId / width) > Math.floor(startId / width) ? 1 : -1;
+
+                let currentSquare = startId + width * directionY + directionX;
+
+                while (currentSquare !== targetId) {
+
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent && currentSquare !== targetId) {
+                        return false;
+                    }
+                    currentSquare += width * directionY + directionX;
+                }
+                return true
+            } 
+            break;
+
+        case 'rook':
+            console.log("ROOK HAS BEEN MOVED");
+            const isVerticalMove = startId % width === targetId % width;
+            const isHorizontalMove = Math.floor(startId / width) === Math.floor(targetId / width);
+            if (isVerticalMove) {
+                const direction = targetId > startId ? 1 : -1;
+                const increment = width * direction;
+
+                let currentSquare = startId + increment;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += increment;
+                }
+                return true;
+            } else if (isHorizontalMove) {
+                const direction = targetId > startId ? 1 : -1;
+                const increment = direction;
+
+                let currentSquare = startId + increment;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += increment;
+                }
+                return true;
+            } else {
+                break;
+            }
+        case 'queen':
+            console.log("QUEEN HAS BEEN MOVED");
+            const isDiagonalMove_Queen = Math.abs(targetId % width - startId % width) === Math.abs(Math.floor(targetId / width) - Math.floor(startId / width))
+            const isVerticalMove_Queen = startId % width === targetId % width;
+            const isHorizontalMove_Queen = Math.floor(startId / width) === Math.floor(targetId / width);
+            if (isDiagonalMove_Queen) {
+                const directionX = targetId % width > startId % width ? 1 : -1;
+                const directionY = Math.floor(targetId / width) > Math.floor(startId / width) ? 1 : -1;
+
+                let currentSquare = startId + width * directionY + directionX;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += width * directionY + directionX;
+                }
+                return true
+            } else if (isVerticalMove_Queen) {
+                const direction = targetId > startId ? 1 : -1;
+                const increment = width * direction;
+
+                let currentSquare = startId + increment;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += increment;
+                }
+                return true;
+            } else if (isHorizontalMove_Queen) {
+                const direction = targetId > startId ? 1 : -1;
+                const increment = direction;
+
+                let currentSquare = startId + increment;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += increment;
+                }
+                return true;
+            } else {
+                break;
+            }
+        case 'king':
+            if (
+                startId + 1 === targetId ||
+                startId - 1 === targetId ||
+                startId + width === targetId ||
+                startId - width === targetId ||
+                startId + width - 1 === targetId ||
+                startId + width + 1 === targetId ||
+                startId - width - 1 === targetId ||
+                startId - width + 1 === targetId
+            ) {
+                return true
+            }
+            break;
+    }
 }
 
 function changePlayer() {
     if (playerGo === 'black') {
         reverseIds()
         playerGo = 'white'
-        playerDisplay.textContent = 'white'
+        playerDisplay.textContent = "white's"
     } else {
         revertIds()
         playerGo = 'black'
-        playerDisplay.textContent = 'black'
+        playerDisplay.textContent = "black's"
     }
 }
 
@@ -120,14 +308,22 @@ function revertIds() {
     allSquares.forEach((square, i) => square.setAttribute('square-id', i))
 }
 
-function checkIfValid(target) {
-    const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
-    const startId = Number(startPositionId)
-    const piece = draggedElement.id
-    console.log('targetId', targetId);
-    console.log('startId', startId);
-    console.log('piece', piece);
+function checkForWin() {
+    const kings = Array.from(document.querySelectorAll('#king'))
+    console.log(kings);
+    if (kings.some(kings => king.firstChild.classList.contains('white'))) {
+        infoDisplay.innerHTML = "Black player wins!"
+        const allSquares = document.querySelectorAll('.square')
+        allSquares.forEach(square => square.firstChild?.setAttribute('draggable', false))
+    }
+    if (kings.some(kings => king.firstChild.classList.contains('black'))) {
+        infoDisplay.innerHTML = "White player wins!"
+        const allSquares = document.querySelectorAll('.square')
+        allSquares.forEach(square => square.firstChild?.setAttribute('draggable', false))
+    }
+}
 
+    /*
     switch (piece) {
         case 'pawn' :
             const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
@@ -155,17 +351,65 @@ function checkIfValid(target) {
             break;
         case 'bishop' :
             if (
+                //moving in the rightward direction
                 startId + width + 1 === targetId ||
-                startId + width * 2 + 2 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId ||
-                startId + width * 3 + 3 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
-                startId + width * 4 + 4 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
-                startId + width * 5 + 5 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
-                startId + width * 6 + 6 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId ||
-                startId + width * 7 + 7 && !document.querySelector('[square-id="${startId + width + 1}"]'.firstChild) === targetId &&  !document.querySelector('[square-id="${startId + width * 2 + 2}"]'.firstChild) === targetId 
-            )
-            {
+                startId + width * 2 + 2 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild === targetId ||
+                startId + width * 3 + 3 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 + 2}"]').firstChild ||
+                startId + width * 4 + 4 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 + 3}"]').firstChild ||
+                startId + width * 5 + 5 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 + 4}"]').firstChild ||
+                startId + width * 6 + 6 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 + 4}"]').firstChild && !document.querySelector('[square-id="${startId + width * 5 + 5}"]').firstChild ||
+                startId + width * 7 + 7 === targetId && !document.querySelector('[square-id="${startId + width + 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 + 4}"]').firstChild && !document.querySelector('[square-id="${startId + width * 5 + 5}"]').firstChild && !document.querySelector('[square-id="${startId + width * 6 + 6}"]').firstChild ||
+                //moving in the leftward direction
+                startId - width - 1 === targetId ||
+                startId - width * 3 - 3 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 - 2}"]').firstChild ||
+                startId - width * 2 - 2 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild ||
+                startId - width * 4 - 4 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 - 3}"]').firstChild ||
+                startId - width * 5 - 5 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 - 4}"]').firstChild ||
+                startId - width * 6 - 6 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 - 4}"]').firstChild && !document.querySelector('[square-id="${startId - width * 5 - 5}"]').firstChild ||
+                startId - width * 7 - 7 === targetId && !document.querySelector('[square-id="${startId - width - 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 - 4}"]').firstChild && !document.querySelector('[square-id="${startId - width * 5 - 5}"]').firstChild && !document.querySelector('[square-id="${startId - width * 6 - 6}"]').firstChild ||
+
+                //moving backwards in the rightward direction
+                startId - width + 1 === targetId ||
+                startId - width * 2 + 2 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild ||
+                startId - width * 3 + 3 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 + 2}"]').firstChild ||
+                startId - width * 4 + 4 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 + 3}"]').firstChild ||
+                startId - width * 5 + 5 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 + 4}"]').firstChild ||
+                startId - width * 6 + 6 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 + 4}"]').firstChild && !document.querySelector('[square-id="${startId - width * 5 + 5}"]').firstChild ||
+                startId - width * 7 + 7 === targetId && !document.querySelector('[square-id="${startId - width + 1}"]').firstChild && !document.querySelector('[square-id="${startId - width * 2 + 2}"]').firstChild && !document.querySelector('[square-id="${startId - width * 3 + 3}"]').firstChild && !document.querySelector('[square-id="${startId - width * 4 + 4}"]').firstChild && !document.querySelector('[square-id="${startId - width * 5 + 5}"]').firstChild && !document.querySelector('[square-id="${startId - width * 6 + 6}"]').firstChild ||
+
+                //moving backwards in the leftward direction
+                startId + width - 1 === targetId ||
+                startId + width * 2 - 2 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild ||
+                startId + width * 3 - 3 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 - 2}"]').firstChild ||
+                startId + width * 4 - 4 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 - 3}"]').firstChild ||
+                startId + width * 5 - 5 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 - 4}"]').firstChild ||
+                startId + width * 6 - 6 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 - 4}"]').firstChild && !document.querySelector('[square-id="${startId + width * 5 - 5}"]').firstChild ||
+                startId + width * 7 - 7 === targetId && !document.querySelector('[square-id="${startId + width - 1}"]').firstChild && !document.querySelector('[square-id="${startId + width * 2 - 2}"]').firstChild && !document.querySelector('[square-id="${startId + width * 3 - 3}"]').firstChild && !document.querySelector('[square-id="${startId + width * 4 - 4}"]').firstChild && !document.querySelector('[square-id="${startId + width * 5 - 5}"]').firstChild && !document.querySelector('[square-id="${startId + width * 6 - 6}"]').firstChild
+            ) {
                 return true
             }
             break;
     }
-}
+    */
+
+    /*  const isHorizontalMove = Math.floor(startId / width) === Math.floor(targetId / width);
+            if (isHorizontalMove) {
+                const direction = targetId > startId ? 1 : -1;
+                const increment = direction;
+
+                let currentSquare = startId + increment;
+
+                while (currentSquare !== targetId) {
+                    const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+                    if (!currentSquareElement) {
+                        return false;
+                    }
+
+                    const squareContent = currentSquareElement.firstChild;
+                    if (squareContent) {
+                        return false;
+                    }
+                    currentSquare += increment;
+                }
+                return true;
+            }*/
