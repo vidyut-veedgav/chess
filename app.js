@@ -3,8 +3,8 @@ const gameBoard = document.querySelector("#gameboard"); //gameboard
 const playerDisplay = document.querySelector("#player"); //player
 const infoDisplay = document.querySelector("#info-display"); //info
 const width = 8; //width of gameboard
-let playerGo = 'black'
-playerDisplay.textContent = "black's"
+let playerGo = 'black' //keeping track of who's turn it is
+playerDisplay.textContent = "black"
 
 const startPieces = [
     rook, knight, bishop, queen, king, bishop, knight, rook,
@@ -61,13 +61,54 @@ function dragOver(e) {
     e.preventDefault()
 }
 
+//DRAG DROP FUNCTION - CENTRAL COMMAND
 function dragDrop(e) {
+
+    e.stopPropagation()
+    console.log(e.target);
+
+    //check if the correct player is going
+    const isCorrectGo = draggedElement.firstChild.classList.contains(playerGo)
+    console.log("isCorrectGo", isCorrectGo);
+
+    //keeping track of the opponent's color for a given move
+    const isOpponentGo = playerGo === 'white' ? 'black' : 'white'
+    console.log("isOpponentGo", isOpponentGo);
+
+    //check if something is taken
+    const isSpotTaken = e.target.classList.contains('piece');
+
+    //check if something is taken by opponent
+    const takenByOpponent = (e.target !== null) && e.target.classList.contains(isOpponentGo);
+    //const takenByOpponent = e.target.firstChild?.classList.contains(isOpponentGo)
+
+    console.log("takenByOpponent", takenByOpponent);
+
+    
+    if (isCorrectGo) {
+        if (takenByOpponent && isValid) {
+            e.target.parentNode.append(draggedElement)
+            e.target.remove()
+            changePlayer()
+            return
+        }
+    }
+    
+    changePlayer()
+
+    /*
     e.stopPropagation() 
+
+    //checks if the correct player is going
     const correctGo = draggedElement.firstChild.classList.contains(playerGo)
     const taken = e.target.classList.contains('piece')
+    console.log("taken: " + taken);
     const valid = checkIfValid(e.target)
+    console.log("valid: " + valid);
     const opponentGo = playerGo === 'white' ? 'black' : 'white'
+    console.log("opponentGo: " + opponentGo);
     const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo)
+    console.log("takenByOpponent");
     
     if (correctGo) {
 
@@ -95,9 +136,24 @@ function dragDrop(e) {
     }
     console.log("Invalid move: Incorrect piece or invalid destination");
     changePlayer()
+    */
 }
 
+function takePiece(targetSquare) {
+    const opponentPieceColor = playerGo === 'black' ? 'white' : 'black';
+
+    // Check if the target square is occupied by an opponent's piece
+    if (targetSquare.firstChild && targetSquare.firstChild.classList.contains(opponentPieceColor)) {
+        // Remove the opponent's piece from the board
+        targetSquare.removeChild(targetSquare.firstChild);
+        return true; // Return true to indicate a successful piece capture
+    }
+    return false; // Return false if no piece was captured
+}
+
+
 function checkIfValid(target) {
+
     const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
     const startId = Number(startPositionId)
     const piece = draggedElement.id
@@ -109,14 +165,25 @@ function checkIfValid(target) {
         case 'pawn':
             console.log("PAWN HAS BEEN MOVED");
             const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
-            if (starterRow.includes(startId) && startId + width * 2 === targetId
+            if (
+            starterRow.includes(startId) && startId + width * 2 === targetId
             || startId + width === targetId
             || startId + width - 1 === targetId && document.querySelector('[square-id="${startId + width - 1}"]').firstChild
             || startId + width + 1 === targetId && document.querySelector('[square-id="${startId + width + 1}"]').firstChild) 
             {
                 return true
-            }
+            } 
+            const newRow = [48, 49, 50, 51, 52, 53, 54, 55]
+            if (
+            newRow.includes(startId) && startId - width * 2 === targetId
+            || startId - width === targetId
+            || startId - width - 1 === targetId && document.querySelector('[square-id="${startId + width - 1}"]').firstChild
+            || startId - width + 1 === targetId && document.querySelector('[square-id="${startId + width + 1}"]').firstChild) 
+            {
+                return true
+            } 
             break; 
+
         case 'knight':
             console.log("KNIGHT HAS BEEN MOVED");
             if (
@@ -134,26 +201,29 @@ function checkIfValid(target) {
             break;
             
         case 'bishop':
-            console.log("BISHOP HAS BEEN MOVED");
+            console.log("BISHOP MOVEMENT: ");
             const isDiagonalMove = Math.abs(targetId % width - startId % width) === Math.abs(Math.floor(targetId / width) - Math.floor(startId / width))
             if (isDiagonalMove) {
                 const directionX = targetId % width > startId % width ? 1 : -1;
                 const directionY = Math.floor(targetId / width) > Math.floor(startId / width) ? 1 : -1;
 
                 let currentSquare = startId + width * directionY + directionX;
-
                 while (currentSquare !== targetId) {
 
                     const currentSquareElement = document.querySelector(`[square-id="${currentSquare}"]`);
+
+                    console.log("currently on: " + currentSquareElement.firstChild);
                     if (!currentSquareElement) {
                         return false;
                     }
 
                     const squareContent = currentSquareElement.firstChild;
+                    console.log(squareContent);
                     if (squareContent && currentSquare !== targetId) {
                         return false;
                     }
                     currentSquare += width * directionY + directionX;
+                    console.log("moved to: " + currentSquare)
                 }
                 return true
             } 
@@ -285,15 +355,16 @@ function checkIfValid(target) {
     }
 }
 
+
 function changePlayer() {
     if (playerGo === 'black') {
         reverseIds()
         playerGo = 'white'
-        playerDisplay.textContent = "white's"
+        playerDisplay.textContent = "white"
     } else {
         revertIds()
         playerGo = 'black'
-        playerDisplay.textContent = "black's"
+        playerDisplay.textContent = "black"
     }
 }
 
@@ -413,3 +484,60 @@ function checkForWin() {
                 }
                 return true;
             }*/
+
+/*
+
+            const starterRow = [8, 9, 10, 11, 12, 13, 14, 15]
+
+            //checking if the targetId for the starting pawn is one or two spaces up
+            if (starterRow.includes(startId) && startId + width * 2 === targetId || startId + width === targetId)
+            {
+                return true
+            }
+            const newRow = [48, 49, 50, 51, 52, 53, 54, 55]
+
+            //checks if the targetId is one space up for pawns
+            if (newRow.includes(startId) || startId - width * 2 === targetId || startId - width === targetId) {
+
+                var finalSpot = startId - width
+                console.log(finalSpot);
+                console.log(document.querySelector(`[square-id="${finalSpot}"]`));
+
+                //checking is the finalspot contains a piece
+                if (document.querySelector(`[square-id="${finalSpot}"]`).firstChild !== null 
+                && document.querySelector(`[square-id="${finalSpot}"]`).firstChild.classList.contains('piece')) {
+                    return false
+                } 
+                return true
+            
+            } else if (newRow.includes(startId) || startId - width - 1 === targetId || startId - width + 1 === targetId) {
+
+                if (targetId === startId - width - 1) {
+                    var finalSpot = startId - width - 1
+                    console.log(finalSpot);
+                    console.log(document.querySelector(`[square-id="${finalSpot}"]`));
+
+                    //checks if a piece exists
+                    if (document.querySelector(`[square-id="${finalSpot}"]`).classList.contains('piece')) {
+                        takePiece(document.querySelector(`[square-id="${finalSpot}"]`))
+                        return true
+                    } 
+                    return true;
+                }
+
+                if (targetId === startId - width + 1) {
+                    var finalSpot = startId - width + 1
+                    console.log(finalSpot);
+                    console.log(document.querySelector(`[square-id="${finalSpot}"]`));
+
+                    //checks if a piece exists
+                    if (document.querySelector(`[square-id="${finalSpot}"]`).classList.contains('piece')) {
+                        takePiece(document.querySelector('[square-id="${finalSpot}"]'))
+                        return true
+                    } 
+                    return true;
+                }
+
+            }
+            break; 
+            */
