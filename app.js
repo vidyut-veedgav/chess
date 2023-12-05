@@ -245,7 +245,7 @@ function checkIfValid(target) {
 
             //checks if the pawn wants to move one square forward
             if (startId + width === targetId && trueTargetSquare.firstChild === null) {
-                return false;
+                return true;
             }
 
             //checks if the pawn wants to take diagonally to the right but there is no piece
