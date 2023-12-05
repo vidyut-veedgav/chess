@@ -1,5 +1,6 @@
 //defining global variables
 const gameBoard = document.querySelector("#gameboard"); //gameboard
+const messageBoxDisplay = document.querySelector("#messageBox")
 const playerDisplay = document.querySelector("#player"); //player
 const infoDisplay = document.querySelector("#info-display"); //info
 const width = 8; //width of gameboard
@@ -95,6 +96,10 @@ function dragDrop(e) {
         if (opponentPieceCaptured  && validMove) {
             e.target.parentNode.append(draggedElement)
             e.target.remove()
+            if (e.target.classList.contains('fa-shuttle-space')) {   
+                console.log("Space Shuttle captured!");
+                messageBoxDisplay.textContent = "Space Shuttle has been captured! Odyssey complete."
+            }
             changePlayer()
             return
         }
@@ -127,7 +132,7 @@ function dragDrop(e) {
         }
         */
     }
-    changePlayer()
+
 
     /*
     e.stopPropagation() 
@@ -225,45 +230,47 @@ function checkIfValid(target) {
         console.log("trueTargetSquare" + trueTargetSquare);
     }
 
-    /*
     //5th parent
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode;
     }
 
     //6th parent
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
     }
 
     //7th parent
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
     }
 
     //8th parent
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
     }
+    //9th parent
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+        console.log("target is the icon");
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+    }
+
     //10th parent
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
+    else if (target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
+        targetId = Number(target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('square-id'));
+        trueTargetSquare = target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
     }
-    else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
-        console.log("target is the icon");
-        targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
-        trueTargetSquare = target.parentNode.parentNode.parentNode;
-    }
+    /*
     else if (target.parentNode.parentNode.parentNode.getAttribute('square-id') !== null) {
         console.log("target is the icon");
         targetId = Number(target.parentNode.parentNode.parentNode.getAttribute('square-id'));
@@ -388,8 +395,18 @@ function checkIfValid(target) {
             }
 
             //checks if the pawn wants to move one square forward
-            if (startId + width === targetId) {
-                return true;
+            if (startId + width === targetId && trueTargetSquare.firstChild === null) {
+                return false;
+            }
+
+            //checks if the pawn wants to take diagonally to the right but there is no piece
+            if (startId + width - 1 === targetId && trueTargetSquare.firstChild === null) {
+                return false;
+            }
+
+            //checks if the pawn wants to take diagonally to the left but there is no piece
+            if (startId + width + 1 === targetId && trueTargetSquare.firstChild === null) {
+                return false;
             }
             
             //checks if the pawn wants to take diagonally to the right

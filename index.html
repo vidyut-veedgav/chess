@@ -7,8 +7,46 @@
 </head>
 <body>
     <div id="container">
-        <div id="gameboard"></div>
-        <p>It's <span id="player"></span>'s turn.</p>
+        <div id="boardAndTable" class="flex-container">
+            <div>
+                <h1 class="gameHeader" style="font-size:xx-large;">Chess: Odyssey</h1>
+                <div id="gameboard"></div>
+                <h1 id="messageBox" class="playerInfo">It's <span id="player"></span>'s turn.</h1>
+            </div>
+            <div id="piece-conversions">
+                <h2>Piece Conversions</h2>
+                <table>
+                    <tr>
+                        <td><i class="fa-solid fa-shuttle-space"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-king"></i></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-jet-fighter-up"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-queen"></i></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-helicopter"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-knight"></i></td>
+                    </tr><tr>
+                        <td><i class="fa-solid fa-motorcycle"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-bishop"></i></td>
+                    </tr><tr>
+                        <td><i class="fa-solid fa-ship"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-rook"></i></td>
+                    </tr><tr>
+                        <td><i class="fa-solid fa-paper-plane"></i></td>
+                        <td>=</td>
+                        <td><i class="fa-solid fa-chess-pawn"></i></td>
+                    </tr>
+                    <!--add more rows here-->
+                </table>
+            </div>
+        </div>
         <p id="information"></p>
     </div>
     <!--
@@ -28,12 +66,12 @@
         justify-content: center;
         height: 100vh;
         margin: 0;
-        background-color: rgb(255, 255, 255); /* Add your desired background color */
-        font-family: cursive;
+        background-color: rgb(214, 221, 252); /* Add your desired background color */
+        font-family:monospace;
     }
 
-    #container {
-        text-align: center;
+    #messageBox {
+        font-size:x-large;
     }
 
     #gameboard {
@@ -41,6 +79,33 @@
         height: 600px;
         display: flex;
         flex-wrap: wrap;
+    }
+
+    #piece-conversions {
+        margin-top: 55px;
+        margin-left: 90px;
+        text-align: left;
+    }
+
+    #piece-conversions table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #piece-conversions table, #piece-conversions td {
+        border: 1px solid black;
+    }
+
+    #piece-conversions td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    .gameHeader {
+        text-align: center;
+    }
+    .playerInfo {
+        text-align: center;
     }
 
     .square {
@@ -58,16 +123,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 37.5px; 
+        font-size: 52.5px; 
         position: relative;
     }
 
     .beige {
-        background-color: rgb(149, 144, 154);
+        background-color: rgb(145, 135, 135);
     }
 
     .brown {
-        background-color: rgb(128, 103, 182);
+        background-color: rgb(70, 104, 156);
     }
 
     .black {
@@ -88,6 +153,27 @@
         z-index: 9;
     }
 
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
 
 </style>
 </html>
+
+
+<!--
+
+    <div id="piece-conversions">
+        <h2>Piece Conversions</h2>
+        <table>
+            <tr>
+                <td>Space Shuttle</td>
+                <td>=</td>
+                <td>King</td>
+            </tr>
+            <!-- Add more rows for other pieces 
+        </table>
+    </div>
+-->
