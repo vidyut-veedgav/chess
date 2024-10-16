@@ -1,5 +1,4 @@
-
-Instructions to run:
+# Chess!
 
 Right click on index.html file in your local machine's file explorer, and select the open in browser option. 
 Ensure that the browser that you open the file in is Chrome. 
