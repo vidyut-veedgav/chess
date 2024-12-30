@@ -16,5 +16,5 @@ This is a simple chess application built using vanilla JavaScript, HTML, and CSS
    ```bash
    git clone <repository-url>
    cd <dir-name>
-2. **Open index.html and enjoy!
+2. **Open index.html and enjoy!**
 
